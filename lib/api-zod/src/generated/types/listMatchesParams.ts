@@ -5,7 +5,8 @@
  * FanZone football fan group API
  * OpenAPI spec version: 0.1.0
  */
+import type { ListMatchesStatus } from './listMatchesStatus';
 
-export interface HealthStatus {
-  status: string;
-}
+export type ListMatchesParams = {
+status?: ListMatchesStatus;
+};

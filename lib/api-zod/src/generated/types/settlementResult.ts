@@ -5,7 +5,10 @@
  * FanZone football fan group API
  * OpenAPI spec version: 0.1.0
  */
+import type { Match } from './match';
 
-export interface HealthStatus {
-  status: string;
+export interface SettlementResult {
+  match: Match;
+  winnersCount: number;
+  xpAwarded: number;
 }

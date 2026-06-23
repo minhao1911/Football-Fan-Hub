@@ -5,7 +5,10 @@
  * FanZone football fan group API
  * OpenAPI spec version: 0.1.0
  */
+import type { Poke } from './poke';
 
-export interface HealthStatus {
-  status: string;
+export interface PokeSummary {
+  matchId: number;
+  totalPokes: number;
+  recentPokes: Poke[];
 }

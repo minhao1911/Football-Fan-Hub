@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface FanGroupInput {
+  /** @minLength 1 */
+  name: string;
+  description: string;
+  badgeColor?: string;
+  badgeEmoji?: string;
 }

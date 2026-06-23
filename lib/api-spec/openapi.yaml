@@ -1,22 +1,38 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: FanZone football fan group API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User profile operations
+  - name: groups
+    description: Fan group operations
+  - name: matches
+    description: Live match post operations
+  - name: chat
+    description: Live match chat
+  - name: forum
+    description: Match discussion forum
+  - name: pokes
+    description: Match poke interactions
+  - name: predictions
+    description: Match score predictions
+  - name: leaderboard
+    description: Group and user leaderboards
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +40,964 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # Users
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Unauthorized
+    patch:
+      operationId: updateMe
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  # Fan Groups
+  /groups:
+    get:
+      operationId: listGroups
+      tags: [groups]
+      summary: List all fan groups
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of fan groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FanGroup"
+    post:
+      operationId: createGroup
+      tags: [groups]
+      summary: Create a fan group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FanGroupInput"
+      responses:
+        "201":
+          description: Created fan group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FanGroup"
+
+  /groups/{groupId}:
+    get:
+      operationId: getGroup
+      tags: [groups]
+      summary: Get a fan group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Fan group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FanGroup"
+        "404":
+          description: Not found
+
+  /groups/{groupId}/join:
+    post:
+      operationId: joinGroup
+      tags: [groups]
+      summary: Join a fan group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Joined group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FanGroup"
+
+  /groups/{groupId}/leave:
+    post:
+      operationId: leaveGroup
+      tags: [groups]
+      summary: Leave a fan group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Left group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FanGroup"
+
+  /groups/{groupId}/members:
+    get:
+      operationId: listGroupMembers
+      tags: [groups]
+      summary: List members of a fan group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Group members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GroupMember"
+
+  # Matches
+  /matches:
+    get:
+      operationId: listMatches
+      tags: [matches]
+      summary: List all live match posts
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [live, upcoming, settled]
+      responses:
+        "200":
+          description: List of match posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Match"
+    post:
+      operationId: createMatch
+      tags: [matches]
+      summary: Create a match post (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchInput"
+      responses:
+        "201":
+          description: Created match
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Match"
+
+  /matches/{matchId}:
+    get:
+      operationId: getMatch
+      tags: [matches]
+      summary: Get a match post
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Match post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Match"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateMatch
+      tags: [matches]
+      summary: Update a match post (admin only)
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchUpdate"
+      responses:
+        "200":
+          description: Updated match
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Match"
+
+  /matches/{matchId}/settle:
+    post:
+      operationId: settleMatch
+      tags: [admin]
+      summary: Settle match result and award XP (admin only)
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchSettlement"
+      responses:
+        "200":
+          description: Match settled with XP awarded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettlementResult"
+
+  # Chat
+  /matches/{matchId}/chat:
+    get:
+      operationId: listChatMessages
+      tags: [chat]
+      summary: List chat messages for a match
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Chat messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatMessage"
+    post:
+      operationId: sendChatMessage
+      tags: [chat]
+      summary: Send a chat message
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatMessageInput"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatMessage"
+
+  # Forum
+  /matches/{matchId}/forum:
+    get:
+      operationId: listForumPosts
+      tags: [forum]
+      summary: List forum posts for a match
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Forum posts with reply counts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ForumPost"
+    post:
+      operationId: createForumPost
+      tags: [forum]
+      summary: Create a forum post
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForumPostInput"
+      responses:
+        "201":
+          description: Forum post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForumPost"
+
+  /matches/{matchId}/forum/{postId}/replies:
+    get:
+      operationId: listForumReplies
+      tags: [forum]
+      summary: List replies for a forum post
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Forum replies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ForumReply"
+    post:
+      operationId: createForumReply
+      tags: [forum]
+      summary: Reply to a forum post
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForumReplyInput"
+      responses:
+        "201":
+          description: Reply created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForumReply"
+
+  # Pokes
+  /matches/{matchId}/pokes:
+    get:
+      operationId: listPokes
+      tags: [pokes]
+      summary: Get poke counts for a match
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Poke summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PokeSummary"
+    post:
+      operationId: sendPoke
+      tags: [pokes]
+      summary: Poke another user in a match
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PokeInput"
+      responses:
+        "201":
+          description: Poke sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Poke"
+
+  # Predictions
+  /matches/{matchId}/predictions:
+    get:
+      operationId: listPredictions
+      tags: [predictions]
+      summary: List predictions for a match (admin sees all, user sees own)
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Predictions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Prediction"
+    post:
+      operationId: submitPrediction
+      tags: [predictions]
+      summary: Submit a score prediction
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredictionInput"
+      responses:
+        "201":
+          description: Prediction submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Prediction"
+
+  /matches/{matchId}/predictions/me:
+    get:
+      operationId: getMyPrediction
+      tags: [predictions]
+      summary: Get current user's prediction for a match
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: My prediction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Prediction"
+        "404":
+          description: No prediction yet
+
+  # Leaderboard
+  /leaderboard/groups:
+    get:
+      operationId: getGroupLeaderboard
+      tags: [leaderboard]
+      summary: Get group leaderboard ranked by total XP
+      responses:
+        "200":
+          description: Group leaderboard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GroupLeaderboardEntry"
+
+  /leaderboard/users:
+    get:
+      operationId: getUserLeaderboard
+      tags: [leaderboard]
+      summary: Get top users ranked by XP
+      responses:
+        "200":
+          description: User leaderboard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserLeaderboardEntry"
+
+  # Admin
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get admin dashboard stats
+      responses:
+        "200":
+          description: Admin stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    UserProfile:
+      type: object
+      required: [id, clerkId, username, xp, isAdmin, createdAt]
+      properties:
+        id:
+          type: integer
+        clerkId:
+          type: string
+        username:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        favoriteTeam:
+          type: ["string", "null"]
+        xp:
+          type: integer
+        isAdmin:
+          type: boolean
+        groupId:
+          type: ["integer", "null"]
+        groupName:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        username:
+          type: string
+        bio:
+          type: string
+        favoriteTeam:
+          type: string
+        avatarUrl:
+          type: string
+
+    FanGroup:
+      type: object
+      required: [id, name, description, memberCount, totalXp, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        badgeColor:
+          type: ["string", "null"]
+        badgeEmoji:
+          type: ["string", "null"]
+        memberCount:
+          type: integer
+        totalXp:
+          type: integer
+        isMember:
+          type: boolean
+        createdAt:
+          type: string
+
+    FanGroupInput:
+      type: object
+      required: [name, description]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        badgeColor:
+          type: string
+        badgeEmoji:
+          type: string
+
+    GroupMember:
+      type: object
+      required: [id, username, xp, joinedAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        favoriteTeam:
+          type: ["string", "null"]
+        xp:
+          type: integer
+        joinedAt:
+          type: string
+
+    Match:
+      type: object
+      required: [id, title, description, liveUrl, homeTeam, awayTeam, status, pokeCount, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        liveUrl:
+          type: string
+        homeTeam:
+          type: string
+        awayTeam:
+          type: string
+        scheduledAt:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [upcoming, live, settled]
+        homeScore:
+          type: ["integer", "null"]
+        awayScore:
+          type: ["integer", "null"]
+        pokeCount:
+          type: integer
+        chatCount:
+          type: integer
+        predictionCount:
+          type: integer
+        createdAt:
+          type: string
+
+    MatchInput:
+      type: object
+      required: [title, description, liveUrl, homeTeam, awayTeam]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        liveUrl:
+          type: string
+        homeTeam:
+          type: string
+        awayTeam:
+          type: string
+        scheduledAt:
+          type: string
+        status:
+          type: string
+          enum: [upcoming, live, settled]
+
+    MatchUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        liveUrl:
+          type: string
+        status:
+          type: string
+          enum: [upcoming, live, settled]
+
+    MatchSettlement:
+      type: object
+      required: [homeScore, awayScore]
+      properties:
+        homeScore:
+          type: integer
+        awayScore:
+          type: integer
+
+    SettlementResult:
+      type: object
+      required: [match, winnersCount, xpAwarded]
+      properties:
+        match:
+          $ref: "#/components/schemas/Match"
+        winnersCount:
+          type: integer
+        xpAwarded:
+          type: integer
+
+    ChatMessage:
+      type: object
+      required: [id, matchId, userId, username, content, createdAt]
+      properties:
+        id:
+          type: integer
+        matchId:
+          type: integer
+        userId:
+          type: integer
+        username:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        content:
+          type: string
+        createdAt:
+          type: string
+
+    ChatMessageInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+
+    ForumPost:
+      type: object
+      required: [id, matchId, userId, username, title, content, replyCount, createdAt]
+      properties:
+        id:
+          type: integer
+        matchId:
+          type: integer
+        userId:
+          type: integer
+        username:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        title:
+          type: string
+        content:
+          type: string
+        replyCount:
+          type: integer
+        createdAt:
+          type: string
+
+    ForumPostInput:
+      type: object
+      required: [title, content]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        content:
+          type: string
+          minLength: 1
+
+    ForumReply:
+      type: object
+      required: [id, postId, userId, username, content, createdAt]
+      properties:
+        id:
+          type: integer
+        postId:
+          type: integer
+        userId:
+          type: integer
+        username:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        content:
+          type: string
+        createdAt:
+          type: string
+
+    ForumReplyInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+
+    Poke:
+      type: object
+      required: [id, matchId, fromUserId, toUserId, createdAt]
+      properties:
+        id:
+          type: integer
+        matchId:
+          type: integer
+        fromUserId:
+          type: integer
+        fromUsername:
+          type: string
+        toUserId:
+          type: integer
+        toUsername:
+          type: string
+        createdAt:
+          type: string
+
+    PokeInput:
+      type: object
+      required: [toUserId]
+      properties:
+        toUserId:
+          type: integer
+
+    PokeSummary:
+      type: object
+      required: [matchId, totalPokes, recentPokes]
+      properties:
+        matchId:
+          type: integer
+        totalPokes:
+          type: integer
+        recentPokes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Poke"
+
+    Prediction:
+      type: object
+      required: [id, matchId, userId, username, homeScore, awayScore, createdAt]
+      properties:
+        id:
+          type: integer
+        matchId:
+          type: integer
+        userId:
+          type: integer
+        username:
+          type: string
+        homeScore:
+          type: integer
+        awayScore:
+          type: integer
+        isCorrect:
+          type: ["boolean", "null"]
+        xpAwarded:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+
+    PredictionInput:
+      type: object
+      required: [homeScore, awayScore]
+      properties:
+        homeScore:
+          type: integer
+        awayScore:
+          type: integer
+
+    GroupLeaderboardEntry:
+      type: object
+      required: [rank, groupId, groupName, memberCount, totalXp]
+      properties:
+        rank:
+          type: integer
+        groupId:
+          type: integer
+        groupName:
+          type: string
+        badgeColor:
+          type: ["string", "null"]
+        badgeEmoji:
+          type: ["string", "null"]
+        memberCount:
+          type: integer
+        totalXp:
+          type: integer
+
+    UserLeaderboardEntry:
+      type: object
+      required: [rank, userId, username, xp]
+      properties:
+        rank:
+          type: integer
+        userId:
+          type: integer
+        username:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        favoriteTeam:
+          type: ["string", "null"]
+        xp:
+          type: integer
+        groupName:
+          type: ["string", "null"]
+
+    AdminStats:
+      type: object
+      required: [totalUsers, totalGroups, totalMatches, liveMatches, totalPredictions, totalXpAwarded]
+      properties:
+        totalUsers:
+          type: integer
+        totalGroups:
+          type: integer
+        totalMatches:
+          type: integer
+        liveMatches:
+          type: integer
+        totalPredictions:
+          type: integer
+        totalXpAwarded:
+          type: integer
