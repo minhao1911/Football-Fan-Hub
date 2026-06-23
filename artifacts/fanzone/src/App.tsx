@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -5,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider } from "@/contexts/UserContext";
 import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
+import { SplashScreen } from "@/components/SplashScreen";
 import { MatchesPage } from "@/pages/MatchesPage";
 import { MatchDetailPage } from "@/pages/MatchDetailPage";
 import { GroupsPage } from "@/pages/GroupsPage";
@@ -46,11 +48,21 @@ function Router() {
 }
 
 function App() {
+  const [splashDone, setSplashDone] = useState(
+    () => sessionStorage.getItem("splash-shown") === "1",
+  );
+
+  const handleSplashDone = () => {
+    sessionStorage.setItem("splash-shown", "1");
+    setSplashDone(true);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            {!splashDone && <SplashScreen onDone={handleSplashDone} />}
             <Router />
           </WouterRouter>
           <Toaster />
