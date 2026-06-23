@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { forumPostsTable, forumRepliesTable, matchesTable, usersTable } from "@workspace/db";
+import { forumPostsTable, forumRepliesTable, matchesTable, usersTable, notificationsTable } from "@workspace/db";
 import { eq, count, asc, desc } from "drizzle-orm";
 import { authMiddleware } from "../middlewares/auth";
 
@@ -113,6 +113,20 @@ router.post("/matches/:matchId/forum/:postId/replies", async (req, res) => {
 
   const [reply] = await db.insert(forumRepliesTable).values({ postId, userId: req.userId, content }).returning();
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, req.userId));
+
+  const [post] = await db.select().from(forumPostsTable).where(eq(forumPostsTable.id, postId));
+  if (post && post.userId !== req.userId) {
+    const [match] = post.matchId
+      ? await db.select().from(matchesTable).where(eq(matchesTable.id, post.matchId))
+      : [null];
+    await db.insert(notificationsTable).values({
+      userId: post.userId,
+      type: "forum_reply",
+      title: "New reply on your post 💬",
+      body: `${user?.username ?? "Someone"} replied to "${post.title}"${match ? ` in ${match.title}` : ""}`,
+      matchId: post.matchId ?? null,
+    });
+  }
 
   res.status(201).json({
     id: reply.id,

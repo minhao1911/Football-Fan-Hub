@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { pokesTable, matchesTable, usersTable } from "@workspace/db";
+import { pokesTable, matchesTable, usersTable, notificationsTable } from "@workspace/db";
 import { eq, count, desc } from "drizzle-orm";
 import { authMiddleware } from "../middlewares/auth";
 
@@ -70,6 +70,16 @@ router.post("/matches/:matchId/pokes", async (req, res) => {
 
   const [fromUser] = await db.select().from(usersTable).where(eq(usersTable.id, req.userId));
   const [toUser] = await db.select().from(usersTable).where(eq(usersTable.id, toUserId));
+
+  if (toUserId !== req.userId) {
+    await db.insert(notificationsTable).values({
+      userId: toUserId,
+      type: "poke",
+      title: "You got poked! 👉",
+      body: `${fromUser?.username ?? "Someone"} poked you during ${match.title}`,
+      matchId,
+    });
+  }
 
   res.status(201).json({
     id: poke.id,

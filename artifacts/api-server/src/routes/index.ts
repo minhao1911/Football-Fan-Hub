@@ -9,6 +9,7 @@ import pokesRouter from "./pokes";
 import predictionsRouter from "./predictions";
 import leaderboardRouter from "./leaderboard";
 import adminRouter from "./admin";
+import notificationsRouter from "./notifications";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(pokesRouter);
 router.use(predictionsRouter);
 router.use(leaderboardRouter);
 router.use(adminRouter);
+router.use(notificationsRouter);
 
 export default router;

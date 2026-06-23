@@ -84,6 +84,19 @@ export const predictionsTable = pgTable("predictions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const notificationTypeEnum = pgEnum("notification_type", ["poke", "forum_reply", "match_live"]);
+
+export const notificationsTable = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  type: notificationTypeEnum("type").notNull(),
+  title: text("title").notNull(),
+  body: text("body").notNull(),
+  matchId: integer("match_id"),
+  isRead: boolean("is_read").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(usersTable).omit({ id: true, createdAt: true });
 export const insertGroupSchema = createInsertSchema(fanGroupsTable).omit({ id: true, createdAt: true });
 export const insertMatchSchema = createInsertSchema(matchesTable).omit({ id: true, createdAt: true });

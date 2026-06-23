@@ -3,6 +3,7 @@ import { useCurrentUser } from "@/contexts/UserContext";
 import { useGetMe } from "@workspace/api-client-react";
 import { Trophy, Users, Swords, User, Zap, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export function NavBar() {
   const [location] = useLocation();
@@ -45,6 +46,7 @@ export function NavBar() {
 
           {me && (
             <div className="flex items-center gap-2 text-sm text-gray-300">
+              <NotificationBell />
               <Zap size={14} className="text-yellow-400" />
               <span className="font-semibold text-yellow-400">{me.xp} XP</span>
               <span className="hidden sm:inline text-gray-500">·</span>
