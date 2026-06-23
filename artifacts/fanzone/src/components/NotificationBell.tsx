@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Bell } from "lucide-react";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -6,7 +6,7 @@ import { useCurrentUser } from "@/contexts/UserContext";
 
 interface Notification {
   id: number;
-  type: "poke" | "forum_reply" | "match_live";
+  type: "poke" | "forum_reply" | "match_live" | "stream_live";
   title: string;
   body: string;
   matchId: number | null;
@@ -28,7 +28,28 @@ const TYPE_ICON: Record<string, string> = {
   poke: "👉",
   forum_reply: "💬",
   match_live: "🔴",
+  stream_live: "📡",
 };
+
+function requestDesktopPermission() {
+  if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+  }
+}
+
+function showDesktopNotification(title: string, body: string) {
+  if ("Notification" in window && Notification.permission === "granted") {
+    try {
+      new Notification(title, {
+        body,
+        icon: "/favicon.svg",
+        badge: "/favicon.svg",
+      });
+    } catch {
+      // Some browsers restrict Notification in iframes — silently ignore
+    }
+  }
+}
 
 export function NotificationBell() {
   const { userId } = useCurrentUser();
@@ -36,6 +57,13 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const seenIds = useRef<Set<number>>(new Set());
+  const isFirstFetch = useRef(true);
+
+  // Ask for desktop notification permission once
+  useEffect(() => {
+    requestDesktopPermission();
+  }, []);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -44,10 +72,25 @@ export function NotificationBell() {
       });
       if (!res.ok) return;
       const data: Notification[] = await res.json();
+
+      // On subsequent polls, fire desktop notifications for new unread items
+      if (!isFirstFetch.current) {
+        for (const n of data) {
+          if (!n.isRead && !seenIds.current.has(n.id)) {
+            showDesktopNotification(n.title, n.body);
+          }
+        }
+      } else {
+        isFirstFetch.current = false;
+      }
+
+      // Track all notification IDs we've seen
+      data.forEach((n) => seenIds.current.add(n.id));
+
       setNotifications(data);
       setUnreadCount(data.filter((n) => !n.isRead).length);
     } catch {
-      // silently ignore network errors
+      // silently ignore
     }
   }, [userId]);
 
@@ -79,6 +122,7 @@ export function NotificationBell() {
     if (!n.isRead) await markRead(n.id);
     setOpen(false);
     if (n.matchId) navigate(`/matches/${n.matchId}`);
+    else if (n.type === "stream_live") navigate("/feed");
   };
 
   return (
@@ -135,9 +179,7 @@ export function NotificationBell() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium text-white truncate">{n.title}</p>
-                        {!n.isRead && (
-                          <span className="shrink-0 w-2 h-2 rounded-full bg-green-500" />
-                        )}
+                        {!n.isRead && <span className="shrink-0 w-2 h-2 rounded-full bg-green-500" />}
                       </div>
                       <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">{n.body}</p>
                       <p className="text-[10px] text-gray-600 mt-1">{timeAgo(n.createdAt)}</p>

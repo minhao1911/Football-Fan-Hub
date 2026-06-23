@@ -88,6 +88,9 @@ export const feedPostsTable = pgTable("feed_posts", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   content: text("content").notNull(),
+  isStream: boolean("is_stream").notNull().default(false),
+  streamUrl: text("stream_url"),
+  streamTitle: text("stream_title"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -106,7 +109,15 @@ export const feedCommentsTable = pgTable("feed_comments", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const notificationTypeEnum = pgEnum("notification_type", ["poke", "forum_reply", "match_live"]);
+export const feedReactionsTable = pgTable("feed_reactions", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").notNull(),
+  userId: integer("user_id").notNull(),
+  emoji: text("emoji").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const notificationTypeEnum = pgEnum("notification_type", ["poke", "forum_reply", "match_live", "stream_live"]);
 
 export const notificationsTable = pgTable("notifications", {
   id: serial("id").primaryKey(),
