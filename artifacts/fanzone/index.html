@@ -2,23 +2,62 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="FanZone" />
+    <meta name="theme-color" content="#111827" />
+    <meta name="msapplication-TileColor" content="#064e3b" />
+    <meta name="msapplication-TileImage" content="/icons/icon-144.svg" />
+
     <title>FanZone</title>
-    <meta name="description" content="FanZone — built on Replit. Update this description to reflect the app." />
+    <meta name="description" content="The ultimate football fan engagement platform. Live streams, fan feed, predictions, and fan groups." />
     <meta name="robots" content="index, follow" />
-    <meta property="og:title" content="FanZone" />
-    <meta property="og:description" content="FanZone — built on Replit. Update this description to reflect the app." />
+
+    <meta property="og:title" content="FanZone — Football Fan Hub" />
+    <meta property="og:description" content="Live streams, fan feed, predictions, and fan groups for football fans." />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="/opengraph.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="FanZone" />
-    <meta name="twitter:description" content="FanZone — built on Replit. Update this description to reflect the app." />
+    <meta name="twitter:description" content="Live streams, fan feed, predictions, and fan groups for football fans." />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.svg" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144.svg" />
+    <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128.svg" />
+    <link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96.svg" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72.svg" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+      /* Prevent flash of white on load */
+      html { background-color: #030712; }
+      body { margin: 0; padding: 0; background-color: #030712; }
+      /* Safe area support for notched phones */
+      :root {
+        --sat: env(safe-area-inset-top, 0px);
+        --sab: env(safe-area-inset-bottom, 0px);
+        --sal: env(safe-area-inset-left, 0px);
+        --sar: env(safe-area-inset-right, 0px);
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

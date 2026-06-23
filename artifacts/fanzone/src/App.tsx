@@ -3,7 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider } from "@/contexts/UserContext";
-import { NavBar } from "@/components/NavBar";
+import { TopBar } from "@/components/TopBar";
+import { BottomNav } from "@/components/BottomNav";
 import { MatchesPage } from "@/pages/MatchesPage";
 import { MatchDetailPage } from "@/pages/MatchDetailPage";
 import { GroupsPage } from "@/pages/GroupsPage";
@@ -24,18 +25,21 @@ const queryClient = new QueryClient({
 
 function Router() {
   return (
-    <div className="min-h-screen bg-gray-950">
-      <NavBar />
-      <Switch>
-        <Route path="/" component={MatchesPage} />
-        <Route path="/matches/:id" component={MatchDetailPage} />
-        <Route path="/groups" component={GroupsPage} />
-        <Route path="/leaderboard" component={LeaderboardPage} />
-        <Route path="/profile" component={ProfilePage} />
-        <Route path="/feed" component={FeedPage} />
-        <Route path="/admin" component={AdminPage} />
-        <Route component={NotFound} />
-      </Switch>
+    <div className="min-h-screen bg-gray-950 flex flex-col">
+      <TopBar />
+      <main className="flex-1 overflow-y-auto pb-[calc(4rem+var(--sab,0px))]">
+        <Switch>
+          <Route path="/" component={MatchesPage} />
+          <Route path="/matches/:id" component={MatchDetailPage} />
+          <Route path="/groups" component={GroupsPage} />
+          <Route path="/leaderboard" component={LeaderboardPage} />
+          <Route path="/profile" component={ProfilePage} />
+          <Route path="/feed" component={FeedPage} />
+          <Route path="/admin" component={AdminPage} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+      <BottomNav />
     </div>
   );
 }

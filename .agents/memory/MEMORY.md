@@ -1,0 +1,1 @@
+- [Mobile-first PWA layout](mobile-pwa.md) — FanZone converted to mobile-first with TopBar + BottomNav replacing single NavBar; safe area CSS vars; SW at /sw.js.

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="192" y2="192" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="32" fill="url(#bg)"/>
+  <circle cx="96" cy="90" r="52" fill="#16a34a" opacity="0.15"/>
+  <text x="96" y="118" font-size="80" text-anchor="middle" font-family="system-ui">⚽</text>
+  <text x="96" y="162" font-size="16" font-weight="700" text-anchor="middle" font-family="Inter,system-ui" fill="#4ade80" letter-spacing="2">FANZONE</text>
+</svg>
