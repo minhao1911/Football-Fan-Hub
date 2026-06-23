@@ -29,7 +29,8 @@ function Router() {
       <TopBar />
       <main className="flex-1 overflow-y-auto pb-[calc(4rem+var(--sab,0px))]">
         <Switch>
-          <Route path="/" component={MatchesPage} />
+          <Route path="/" component={FeedPage} />
+          <Route path="/matches" component={MatchesPage} />
           <Route path="/matches/:id" component={MatchDetailPage} />
           <Route path="/groups" component={GroupsPage} />
           <Route path="/leaderboard" component={LeaderboardPage} />

@@ -3,8 +3,8 @@ import { Swords, Rss, Users, Trophy, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Matches", icon: Swords },
-  { href: "/feed", label: "Feed", icon: Rss },
+  { href: "/", label: "Feed", icon: Rss },
+  { href: "/matches", label: "Matches", icon: Swords },
   { href: "/groups", label: "Groups", icon: Users },
   { href: "/leaderboard", label: "Board", icon: Trophy },
   { href: "/profile", label: "Profile", icon: User },
