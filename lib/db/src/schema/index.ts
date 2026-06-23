@@ -84,6 +84,20 @@ export const predictionsTable = pgTable("predictions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const feedPostsTable = pgTable("feed_posts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const feedLikesTable = pgTable("feed_likes", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").notNull(),
+  userId: integer("user_id").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const notificationTypeEnum = pgEnum("notification_type", ["poke", "forum_reply", "match_live"]);
 
 export const notificationsTable = pgTable("notifications", {

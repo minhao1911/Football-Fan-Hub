@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useCurrentUser } from "@/contexts/UserContext";
 import { useGetMe } from "@workspace/api-client-react";
-import { Trophy, Users, Swords, User, Zap, Shield } from "lucide-react";
+import { Trophy, Users, Swords, User, Zap, Shield, Rss } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/NotificationBell";
 
@@ -11,6 +11,7 @@ export function NavBar() {
 
   const links = [
     { href: "/", label: "Matches", icon: Swords },
+    { href: "/feed", label: "Feed", icon: Rss },
     { href: "/groups", label: "Groups", icon: Users },
     { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
     { href: "/profile", label: "Profile", icon: User },
