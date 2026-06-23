@@ -98,6 +98,14 @@ export const feedLikesTable = pgTable("feed_likes", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const feedCommentsTable = pgTable("feed_comments", {
+  id: serial("id").primaryKey(),
+  postId: integer("post_id").notNull(),
+  userId: integer("user_id").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const notificationTypeEnum = pgEnum("notification_type", ["poke", "forum_reply", "match_live"]);
 
 export const notificationsTable = pgTable("notifications", {
