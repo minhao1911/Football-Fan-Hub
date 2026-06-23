@@ -1,6 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { useGetMe } from "@workspace/api-client-react";
-import { Swords, Rss, Users, Trophy, User, Shield } from "lucide-react";
+import { Swords, Rss, Users, Trophy, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -13,12 +12,8 @@ const NAV_ITEMS = [
 
 export function BottomNav() {
   const [location] = useLocation();
-  const { data: me } = useGetMe();
 
-  const items = [
-    ...NAV_ITEMS,
-    ...(me?.isAdmin ? [{ href: "/admin", label: "Admin", icon: Shield }] : []),
-  ];
+  const items = NAV_ITEMS;
 
   return (
     <nav

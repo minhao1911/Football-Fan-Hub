@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useGetMe, useUpdateMe } from "@workspace/api-client-react";
 import { useCurrentUser } from "@/contexts/UserContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { Zap, Edit2, Save, X } from "lucide-react";
+import { Zap, Edit2, Save, X, Shield } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from "wouter";
 
 const DEMO_USERS = [1, 2, 3, 4, 5];
 
@@ -136,10 +137,18 @@ export function ProfilePage() {
       </div>
 
       {me?.isAdmin && (
-        <div className="bg-gray-800 border border-yellow-700/40 rounded-xl p-4">
-          <span className="text-yellow-400 text-sm font-semibold">👑 Admin User</span>
-          <p className="text-gray-500 text-xs mt-1">You can create and manage matches via the API.</p>
-        </div>
+        <Link href="/admin">
+          <div className="bg-gray-800 border border-yellow-700/40 hover:border-yellow-500 rounded-xl p-4 flex items-center gap-3 cursor-pointer transition-colors group">
+            <div className="w-10 h-10 rounded-lg bg-yellow-900/40 flex items-center justify-center shrink-0">
+              <Shield size={18} className="text-yellow-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-yellow-400 text-sm font-semibold">Admin Panel</p>
+              <p className="text-gray-500 text-xs mt-0.5">Manage matches, users, and live streams</p>
+            </div>
+            <span className="text-gray-600 group-hover:text-yellow-400 transition-colors text-lg">›</span>
+          </div>
+        </Link>
       )}
     </div>
   );
