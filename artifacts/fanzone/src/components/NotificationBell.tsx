@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Bell } from "lucide-react";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { useCurrentUser } from "@/contexts/UserContext";
 
 interface Notification {
   id: number;
@@ -52,7 +51,6 @@ function showDesktopNotification(title: string, body: string) {
 }
 
 export function NotificationBell() {
-  const { userId } = useCurrentUser();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -60,20 +58,16 @@ export function NotificationBell() {
   const seenIds = useRef<Set<number>>(new Set());
   const isFirstFetch = useRef(true);
 
-  // Ask for desktop notification permission once
   useEffect(() => {
     requestDesktopPermission();
   }, []);
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const res = await fetch("/api/notifications", {
-        headers: { Authorization: `Bearer ${userId}` },
-      });
+      const res = await fetch("/api/notifications", { credentials: "same-origin" });
       if (!res.ok) return;
       const data: Notification[] = await res.json();
 
-      // On subsequent polls, fire desktop notifications for new unread items
       if (!isFirstFetch.current) {
         for (const n of data) {
           if (!n.isRead && !seenIds.current.has(n.id)) {
@@ -84,15 +78,13 @@ export function NotificationBell() {
         isFirstFetch.current = false;
       }
 
-      // Track all notification IDs we've seen
       data.forEach((n) => seenIds.current.add(n.id));
-
       setNotifications(data);
       setUnreadCount(data.filter((n) => !n.isRead).length);
     } catch {
       // silently ignore
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     fetchNotifications();
@@ -103,7 +95,7 @@ export function NotificationBell() {
   const markAllRead = async () => {
     await fetch("/api/notifications/read-all", {
       method: "PATCH",
-      headers: { Authorization: `Bearer ${userId}` },
+      credentials: "same-origin",
     });
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     setUnreadCount(0);
@@ -112,7 +104,7 @@ export function NotificationBell() {
   const markRead = async (id: number) => {
     await fetch(`/api/notifications/${id}/read`, {
       method: "PATCH",
-      headers: { Authorization: `Bearer ${userId}` },
+      credentials: "same-origin",
     });
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
     setUnreadCount((c) => Math.max(0, c - 1));
@@ -158,7 +150,6 @@ export function NotificationBell() {
                 </button>
               )}
             </div>
-
             <div className="max-h-80 overflow-y-auto divide-y divide-gray-800">
               {notifications.length === 0 ? (
                 <div className="px-4 py-8 text-center text-gray-500 text-sm">

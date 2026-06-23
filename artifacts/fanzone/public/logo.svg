@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <circle cx="60" cy="60" r="60" fill="#111827"/>
+  <circle cx="60" cy="60" r="44" fill="#16a34a" stroke="#22c55e" stroke-width="2"/>
+  <circle cx="60" cy="60" r="44" fill="none" stroke="#15803d" stroke-width="1.5"/>
+  <polygon points="60,16 68,38 52,38" fill="#111827"/>
+  <polygon points="60,104 68,82 52,82" fill="#111827"/>
+  <polygon points="16,60 38,52 38,68" fill="#111827"/>
+  <polygon points="104,60 82,52 82,68" fill="#111827"/>
+  <polygon points="26,26 44,40 36,56" fill="#111827"/>
+  <polygon points="94,26 76,40 84,56" fill="#111827"/>
+  <polygon points="26,94 44,80 36,64" fill="#111827"/>
+  <polygon points="94,94 76,80 84,64" fill="#111827"/>
+  <text x="60" y="68" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="22" fill="white" letter-spacing="-1">FZ</text>
+</svg>

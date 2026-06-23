@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { useGetMe, useUpdateMe } from "@workspace/api-client-react";
-import { useCurrentUser } from "@/contexts/UserContext";
+import { useClerk, useUser } from "@clerk/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Zap, Edit2, Save, X, Shield } from "lucide-react";
+import { Zap, Edit2, Save, X, Shield, LogOut } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 
-const DEMO_USERS = [1, 2, 3, 4, 5];
-
 export function ProfilePage() {
-  const { userId, setUserId } = useCurrentUser();
   const qc = useQueryClient();
+  const { signOut } = useClerk();
+  const { user: clerkUser } = useUser();
   const { data: me, isLoading } = useGetMe();
   const { mutate: updateMe } = useUpdateMe();
   const [editing, setEditing] = useState(false);
@@ -28,13 +27,13 @@ export function ProfilePage() {
   const saveEdit = () => {
     updateMe(
       { data: { username, bio, favoriteTeam } },
-      { onSuccess: () => { qc.invalidateQueries({ queryKey: ["/api/users/me"] }); setEditing(false); } },
+      {
+        onSuccess: () => {
+          qc.invalidateQueries({ queryKey: ["/api/users/me"] });
+          setEditing(false);
+        },
+      },
     );
-  };
-
-  const switchUser = (id: number) => {
-    setUserId(id);
-    qc.invalidateQueries();
   };
 
   if (isLoading) {
@@ -46,12 +45,14 @@ export function ProfilePage() {
     );
   }
 
+  const avatarInitial = me?.username?.[0]?.toUpperCase() ?? clerkUser?.firstName?.[0]?.toUpperCase() ?? "?";
+
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
       <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
         <div className="flex items-center gap-4 mb-4">
           <div className="w-16 h-16 rounded-full bg-green-700 flex items-center justify-center text-white text-2xl font-bold">
-            {me?.username?.[0]?.toUpperCase() ?? "?"}
+            {avatarInitial}
           </div>
           <div className="flex-1">
             <h2 className="text-white text-xl font-bold">{me?.username}</h2>
@@ -59,97 +60,104 @@ export function ProfilePage() {
               <Zap size={14} />
               {me?.xp} XP
             </div>
-            {me?.groupName && (
-              <span className="text-xs bg-green-800 text-green-200 px-2 py-0.5 rounded-full mt-1 inline-block">
-                {me.groupName}
+            {me?.isAdmin && (
+              <span className="inline-flex items-center gap-1 text-xs text-purple-400 font-medium mt-0.5">
+                <Shield size={11} /> Admin
               </span>
             )}
           </div>
-          <button
-            onClick={startEdit}
-            className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors"
-          >
-            <Edit2 size={14} />
-          </button>
+          <div className="flex gap-2">
+            {!editing && (
+              <button
+                onClick={startEdit}
+                className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
+              >
+                <Edit2 size={15} />
+              </button>
+            )}
+          </div>
         </div>
 
-        {me?.bio && !editing && (
-          <p className="text-gray-400 text-sm mb-2">{me.bio}</p>
-        )}
-        {me?.favoriteTeam && !editing && (
-          <p className="text-gray-500 text-xs">⚽ Supports: <span className="text-gray-300">{me.favoriteTeam}</span></p>
-        )}
-
-        {editing && (
-          <div className="space-y-3 mt-2">
+        {editing ? (
+          <div className="space-y-3">
             <div>
-              <label className="text-gray-400 text-xs mb-1 block">Username</label>
+              <label className="block text-xs text-gray-400 mb-1">Username</label>
               <input
-                className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-green-500"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
-              <label className="text-gray-400 text-xs mb-1 block">Bio</label>
+              <label className="block text-xs text-gray-400 mb-1">Bio</label>
               <textarea
-                className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-green-500 h-20 resize-none"
+                className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-green-500 resize-none"
+                rows={3}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
               />
             </div>
             <div>
-              <label className="text-gray-400 text-xs mb-1 block">Favorite Team</label>
+              <label className="block text-xs text-gray-400 mb-1">Favorite Team</label>
               <input
-                className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-green-500"
                 value={favoriteTeam}
                 onChange={(e) => setFavoriteTeam(e.target.value)}
               />
             </div>
             <div className="flex gap-2">
-              <button onClick={saveEdit} className="flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                <Save size={13} /> Save
+              <button
+                onClick={saveEdit}
+                className="flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+              >
+                <Save size={14} /> Save
               </button>
-              <button onClick={() => setEditing(false)} className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                <X size={13} /> Cancel
+              <button
+                onClick={() => setEditing(false)}
+                className="flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+              >
+                <X size={14} /> Cancel
               </button>
             </div>
+          </div>
+        ) : (
+          <div className="space-y-2 text-sm">
+            {me?.bio && <p className="text-gray-300">{me.bio}</p>}
+            {me?.favoriteTeam && (
+              <p className="text-gray-400">
+                ⚽ Supports <span className="text-white font-medium">{me.favoriteTeam}</span>
+              </p>
+            )}
+            {me?.groupId && (
+              <p className="text-gray-400">
+                👥 Member of{" "}
+                <Link href="/groups" className="text-green-400 hover:underline">
+                  {me.groupId ? "a fan group" : "no group"}
+                </Link>
+              </p>
+            )}
           </div>
         )}
       </div>
 
-      <div className="bg-gray-800 border border-gray-700 rounded-xl p-5">
-        <h3 className="text-white font-semibold mb-3 text-sm">Demo: Switch User</h3>
-        <p className="text-gray-500 text-xs mb-3">Switch between demo users to test multi-user features (chat, pokes, predictions).</p>
-        <div className="flex gap-2 flex-wrap">
-          {DEMO_USERS.map((id) => (
-            <button
-              key={id}
-              onClick={() => switchUser(id)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                userId === id ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-              }`}
-            >
-              User {id}
-            </button>
-          ))}
-        </div>
+      <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
+        <h3 className="text-white font-semibold mb-3 text-sm uppercase tracking-wide">Account</h3>
+        {clerkUser?.primaryEmailAddress && (
+          <p className="text-sm text-gray-400 mb-4">
+            Signed in as{" "}
+            <span className="text-gray-200">{clerkUser.primaryEmailAddress.emailAddress}</span>
+          </p>
+        )}
+        <button
+          onClick={() => signOut({ redirectUrl: basePath || "/" })}
+          className="flex items-center gap-2 text-sm text-red-400 hover:text-red-300 font-medium transition-colors"
+        >
+          <LogOut size={15} />
+          Sign Out
+        </button>
       </div>
-
-      {me?.isAdmin && (
-        <Link href="/admin">
-          <div className="bg-gray-800 border border-yellow-700/40 hover:border-yellow-500 rounded-xl p-4 flex items-center gap-3 cursor-pointer transition-colors group">
-            <div className="w-10 h-10 rounded-lg bg-yellow-900/40 flex items-center justify-center shrink-0">
-              <Shield size={18} className="text-yellow-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-yellow-400 text-sm font-semibold">Admin Panel</p>
-              <p className="text-gray-500 text-xs mt-0.5">Manage matches, users, and live streams</p>
-            </div>
-            <span className="text-gray-600 group-hover:text-yellow-400 transition-colors text-lg">›</span>
-          </div>
-        </Link>
-      )}
     </div>
   );
 }
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");

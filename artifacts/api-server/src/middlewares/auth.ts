@@ -1,3 +1,4 @@
+import { getAuth } from "@clerk/express";
 import type { Request, Response, NextFunction } from "express";
 import { db } from "@workspace/db";
 import { usersTable } from "@workspace/db";
@@ -13,29 +14,35 @@ declare global {
 }
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
-  let userId = 1;
+  const auth = getAuth(req);
+  const clerkUserId = auth?.userId;
 
-  if (authHeader?.startsWith("Bearer ")) {
-    const token = authHeader.slice(7).trim();
-    const parsed = parseInt(token, 10);
-    if (!isNaN(parsed) && parsed > 0) {
-      userId = parsed;
-    }
+  if (!clerkUserId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
   }
 
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId)).limit(1);
-  if (!user) {
-    const [created] = await db.insert(usersTable).values({
-      username: `fan_${userId}`,
-      xp: 0,
-      isAdmin: false,
-    }).returning();
+  const [existingUser] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.clerkId, clerkUserId))
+    .limit(1);
+
+  if (existingUser) {
+    req.userId = existingUser.id;
+    req.isAdmin = existingUser.isAdmin;
+  } else {
+    const [created] = await db
+      .insert(usersTable)
+      .values({
+        clerkId: clerkUserId,
+        username: `fan_${clerkUserId.slice(-8)}`,
+        xp: 0,
+        isAdmin: false,
+      })
+      .returning();
     req.userId = created.id;
     req.isAdmin = created.isAdmin;
-  } else {
-    req.userId = user.id;
-    req.isAdmin = user.isAdmin;
   }
 
   next();
