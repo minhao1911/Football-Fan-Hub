@@ -101,42 +101,86 @@ const clerkAppearance = {
 function LandingPage() {
   const [, navigate] = useLocation();
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-4 text-center">
-      <div className="mb-8">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <span className="text-6xl">⚽</span>
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-4 text-center relative overflow-hidden"
+      style={{ background: "#071A0F" }}
+    >
+      {/* Stadium floodlight beams */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-px h-2/3 bg-gradient-to-b from-[#1DB954]/20 to-transparent" style={{ transform: "rotate(-15deg) translateX(-50%)" }} />
+        <div className="absolute top-0 left-1/2 w-px h-3/4 bg-gradient-to-b from-[#1DB954]/30 to-transparent" />
+        <div className="absolute top-0 right-1/4 w-px h-2/3 bg-gradient-to-b from-[#1DB954]/20 to-transparent" style={{ transform: "rotate(15deg) translateX(50%)" }} />
+        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-[#1DB954]/8 to-transparent" />
+      </div>
+
+      {/* Pitch pattern at bottom */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-32 opacity-20"
+        style={{
+          background: "repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(29,185,84,0.15) 60px, rgba(29,185,84,0.15) 61px)",
+          borderTop: "2px solid rgba(255,255,255,0.08)",
+        }}
+      />
+
+      {/* Main content */}
+      <div className="relative z-10 mb-10">
+        {/* Ball + glow */}
+        <div className="relative inline-flex items-center justify-center mb-6">
+          <div className="absolute w-24 h-24 rounded-full bg-[#1DB954]/15 blur-2xl animate-pulse" />
+          <span className="text-7xl crowd-pulse">⚽</span>
         </div>
-        <h1 className="text-5xl font-extrabold mb-2">
-          <span className="text-green-400">Fan</span>
-          <span className="text-white">Zone</span>
+
+        <h1 className="text-6xl font-black mb-3 tracking-tight leading-none">
+          <span className="text-[#1DB954]">Fan</span>
+          <span className="text-white">Hub</span>
         </h1>
-        <p className="text-gray-400 text-lg max-w-sm mx-auto">
-          Join your fan group, predict scores, chat live, and rise up the leaderboard.
+        <p className="text-white/50 font-semibold text-sm uppercase tracking-[0.2em] mb-2">
+          Global Football Fan Platform
+        </p>
+        <p className="text-white/60 text-base max-w-xs mx-auto leading-relaxed">
+          The home of global football fans — predict, chat live, and rise up the leaderboard.
         </p>
       </div>
-      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+
+      {/* CTA buttons */}
+      <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full max-w-xs mb-10">
         <button
           onClick={() => navigate("/sign-up")}
-          className="flex-1 bg-green-600 hover:bg-green-500 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+          className="flex-1 font-bold py-3.5 px-6 rounded-2xl transition-all duration-200 active:scale-95 text-white"
+          style={{
+            background: "linear-gradient(135deg, #1DB954 0%, #22C55E 100%)",
+            boxShadow: "0 0 24px rgba(29,185,84,0.4), 0 4px 12px rgba(0,0,0,0.3)",
+          }}
         >
           Get Started
         </button>
         <button
           onClick={() => navigate("/sign-in")}
-          className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-xl border border-gray-700 transition-colors"
+          className="flex-1 font-bold py-3.5 px-6 rounded-2xl border border-white/15 text-white/80 hover:text-white hover:border-white/30 transition-all duration-200 active:scale-95"
+          style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px)" }}
         >
           Sign In
         </button>
       </div>
-      <div className="mt-12 grid grid-cols-3 gap-6 max-w-sm w-full text-center">
+
+      {/* Feature tiles */}
+      <div className="relative z-10 grid grid-cols-3 gap-3 max-w-sm w-full">
         {[
-          { icon: "🔥", label: "Live Chat" },
-          { icon: "🎯", label: "Predict Scores" },
-          { icon: "🏆", label: "Leaderboard" },
-        ].map(({ icon, label }) => (
-          <div key={label} className="bg-gray-900 rounded-xl p-3">
-            <div className="text-2xl mb-1">{icon}</div>
-            <div className="text-xs text-gray-400 font-medium">{label}</div>
+          { icon: "🔥", label: "Live Chat",       desc: "Match reactions" },
+          { icon: "🎯", label: "Predict Scores",  desc: "Earn XP points" },
+          { icon: "🏆", label: "Leaderboard",     desc: "Rise to the top" },
+          { icon: "🌍", label: "Fan Nations",     desc: "Global communities" },
+          { icon: "📊", label: "Fan Polls",       desc: "Vote & predict" },
+          { icon: "⭐", label: "Reputation",      desc: "Build your fame" },
+        ].map(({ icon, label, desc }) => (
+          <div
+            key={label}
+            className="rounded-2xl p-3.5 text-center border border-white/8 hover:border-[#1DB954]/30 transition-all duration-200"
+            style={{ background: "rgba(255,255,255,0.04)" }}
+          >
+            <div className="text-2xl mb-1.5">{icon}</div>
+            <div className="text-xs text-white font-semibold leading-tight">{label}</div>
+            <div className="text-[10px] text-white/35 mt-0.5">{desc}</div>
           </div>
         ))}
       </div>
@@ -182,7 +226,7 @@ function AppShell() {
       <NativeInit />
       <OfflineBanner />
       {!splashDone && <SplashScreen onDone={handleSplashDone} />}
-      <div className="min-h-screen bg-gray-950 flex flex-col">
+      <div className="min-h-screen flex flex-col">
         <TopBar />
         <main className="flex-1 overflow-y-auto pb-[calc(4rem+var(--sab,0px))]">
           <Switch>

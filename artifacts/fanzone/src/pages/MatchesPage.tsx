@@ -1,19 +1,12 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { useListMatches } from "@workspace/api-client-react";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MessageSquare, Flame, BarChart2, Clock, Calendar } from "lucide-react";
+import { MessageSquare, Flame, BarChart2, Calendar, Radio, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 
 type StatusFilter = "all" | "live" | "upcoming" | "settled";
-
-const statusColors: Record<string, string> = {
-  live: "bg-red-500 text-white animate-pulse",
-  upcoming: "bg-blue-500 text-white",
-  settled: "bg-gray-500 text-white",
-};
 
 export function MatchesPage() {
   const [filter, setFilter] = useState<StatusFilter>("all");
@@ -21,93 +14,152 @@ export function MatchesPage() {
     filter === "all" ? {} : { status: filter as "live" | "upcoming" | "settled" },
   );
 
-  const tabs: { key: StatusFilter; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "live", label: "🔴 Live" },
-    { key: "upcoming", label: "Upcoming" },
-    { key: "settled", label: "Settled" },
+  const tabs: { key: StatusFilter; label: string; emoji: string }[] = [
+    { key: "all",      label: "All Fixtures", emoji: "🏟️" },
+    { key: "live",     label: "Live",          emoji: "🔴" },
+    { key: "upcoming", label: "Upcoming",      emoji: "📅" },
+    { key: "settled",  label: "Settled",       emoji: "✅" },
   ];
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-white mb-6">Matches</h1>
+    <div className="max-w-3xl mx-auto px-4 py-6 page-enter">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-extrabold text-white tracking-tight">
+          Match <span className="text-[#1DB954]">Fixtures</span>
+        </h1>
+        <p className="text-white/40 text-sm mt-0.5">Follow every match, live and settled</p>
+      </div>
 
-      <div className="flex gap-2 mb-6">
+      {/* Filter tabs */}
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setFilter(t.key)}
             className={cn(
-              "px-4 py-1.5 rounded-full text-sm font-medium transition-colors",
-              filter === t.key ? "bg-green-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700",
+              "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 shrink-0",
+              filter === t.key
+                ? "bg-[#1DB954] text-white shadow-[0_0_16px_rgba(29,185,84,0.4)]"
+                : "bg-white/5 border border-white/10 text-white/50 hover:text-white/80 hover:bg-white/8",
             )}
           >
+            <span className="text-base leading-none">{t.emoji}</span>
             {t.label}
           </button>
         ))}
       </div>
 
+      {/* Skeletons */}
       {isLoading && (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-32 bg-gray-800 rounded-xl" />
+            <Skeleton key={i} className="h-36 rounded-2xl" style={{ background: "rgba(255,255,255,0.06)" }} />
           ))}
         </div>
       )}
 
-      {matches?.length === 0 && (
-        <div className="text-center text-gray-500 py-16">
-          <p className="text-4xl mb-2">⚽</p>
-          <p>No matches found.</p>
+      {/* Empty */}
+      {!isLoading && matches?.length === 0 && (
+        <div className="text-center py-20">
+          <div className="text-5xl mb-3">🏟️</div>
+          <p className="text-white/40 font-medium">No fixtures found</p>
         </div>
       )}
 
+      {/* Match cards */}
       <div className="space-y-4">
         {matches?.map((match) => (
           <Link key={match.id} href={`/matches/${match.id}`}>
-            <div className="bg-gray-800 border border-gray-700 hover:border-green-600 rounded-xl p-5 cursor-pointer transition-all hover:shadow-lg hover:shadow-green-900/20">
-              <div className="flex items-start justify-between mb-3">
+            <div
+              className={cn(
+                "group relative rounded-2xl p-5 cursor-pointer transition-all duration-300 border overflow-hidden",
+                match.status === "live"
+                  ? "border-[#1DB954]/40 hover:border-[#1DB954]/80 hover:shadow-[0_0_24px_rgba(29,185,84,0.2)]"
+                  : "border-white/8 hover:border-[#1DB954]/40 hover:shadow-[0_0_16px_rgba(29,185,84,0.12)]",
+              )}
+              style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(8px)" }}
+            >
+              {/* Live glow strip */}
+              {match.status === "live" && (
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#1DB954] to-transparent" />
+              )}
+
+              {/* Top row: status + time */}
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "text-xs px-2 py-0.5 rounded-full font-medium",
-                      statusColors[match.status] ?? "bg-gray-600 text-white",
-                    )}
-                  >
-                    {match.status.toUpperCase()}
-                  </span>
+                  {match.status === "live" && (
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-[#1DB954] bg-[#1DB954]/12 border border-[#1DB954]/30 px-2.5 py-1 rounded-full animate-pulse">
+                      <Radio size={10} />
+                      LIVE
+                    </span>
+                  )}
+                  {match.status === "upcoming" && (
+                    <span className="flex items-center gap-1.5 text-xs font-semibold text-blue-300 bg-blue-500/10 border border-blue-500/25 px-2.5 py-1 rounded-full">
+                      <Clock size={10} />
+                      UPCOMING
+                    </span>
+                  )}
+                  {match.status === "settled" && (
+                    <span className="text-xs font-semibold text-white/40 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">
+                      FT
+                    </span>
+                  )}
                   {match.status === "settled" && match.homeScore != null && (
-                    <span className="text-gray-300 font-bold">
+                    <span className="text-white font-bold text-sm">
                       {match.homeScore} – {match.awayScore}
                     </span>
                   )}
                 </div>
-                <span className="text-gray-500 text-xs flex items-center gap-1">
-                  <Calendar size={12} />
+                <span className="text-white/30 text-xs flex items-center gap-1">
+                  <Calendar size={11} />
                   {match.scheduledAt
                     ? formatDistanceToNow(new Date(match.scheduledAt), { addSuffix: true })
                     : formatDistanceToNow(new Date(match.createdAt), { addSuffix: true })}
                 </span>
               </div>
 
+              {/* Teams */}
               <div className="flex items-center justify-between mb-3">
-                <span className="text-white font-semibold text-lg">{match.homeTeam}</span>
-                <span className="text-gray-500 text-sm font-medium">vs</span>
-                <span className="text-white font-semibold text-lg">{match.awayTeam}</span>
+                <div className="flex-1 text-center">
+                  <div className="text-2xl mb-1">🏴</div>
+                  <span className="text-white font-bold text-base leading-tight block">{match.homeTeam}</span>
+                </div>
+
+                <div className="flex flex-col items-center px-4">
+                  <span className="text-[#1DB954]/60 text-xs font-bold tracking-widest uppercase">vs</span>
+                  <div className="w-px h-6 bg-white/10 mt-1" />
+                </div>
+
+                <div className="flex-1 text-center">
+                  <div className="text-2xl mb-1">🏴</div>
+                  <span className="text-white font-bold text-base leading-tight block">{match.awayTeam}</span>
+                </div>
               </div>
 
-              <p className="text-gray-400 text-sm mb-4 line-clamp-2">{match.description}</p>
+              {/* Description */}
+              {match.description && (
+                <p className="text-white/35 text-xs mb-4 line-clamp-1 text-center">{match.description}</p>
+              )}
 
-              <div className="flex items-center gap-4 text-gray-500 text-xs">
-                <span className="flex items-center gap-1">
-                  <MessageSquare size={12} /> {match.chatCount ?? 0} messages
-                </span>
-                <span className="flex items-center gap-1">
-                  <Flame size={12} /> {match.pokeCount} pokes
-                </span>
-                <span className="flex items-center gap-1">
-                  <BarChart2 size={12} /> {match.predictionCount ?? 0} predictions
-                </span>
+              {/* Divider */}
+              <div className="border-t border-white/6 pt-3">
+                <div className="flex items-center justify-around text-white/35 text-xs">
+                  <span className="flex items-center gap-1.5 hover:text-[#1DB954] transition-colors">
+                    <MessageSquare size={12} />
+                    {match.chatCount ?? 0} chats
+                  </span>
+                  <span className="text-white/10">|</span>
+                  <span className="flex items-center gap-1.5 hover:text-orange-400 transition-colors">
+                    <Flame size={12} />
+                    {match.pokeCount} pokes
+                  </span>
+                  <span className="text-white/10">|</span>
+                  <span className="flex items-center gap-1.5 hover:text-blue-400 transition-colors">
+                    <BarChart2 size={12} />
+                    {match.predictionCount ?? 0} picks
+                  </span>
+                </div>
               </div>
             </div>
           </Link>
