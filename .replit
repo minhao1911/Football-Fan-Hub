@@ -48,3 +48,4 @@ channel = "stable-25_05"
 
 [userenv.shared]
 GEMINI_API_KEY = "AQ.Ab8RN6ICFJ2MiQf3fHsyq7JtsTTXlTq9-4pKgY9Rr8lNn-L9zw"
+VITE_CLERK_PUBLISHABLE_KEY = "pk_test_cHJlc2VudC1waXBlZmlzaC0xNy5jbGVyay5hY2NvdW50cy5kZXYk"
