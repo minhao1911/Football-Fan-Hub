@@ -48,20 +48,16 @@ interface FeedComment {
 function getEmbedUrl(url: string): string | null {
   try {
     const u = new URL(url);
-    // YouTube
     const ytId =
       (u.hostname.includes("youtube.com") && u.searchParams.get("v")) ||
       (u.hostname === "youtu.be" && u.pathname.slice(1));
     if (ytId) return `https://www.youtube.com/embed/${ytId}?autoplay=0&rel=0`;
-    // Twitch
     if (u.hostname.includes("twitch.tv")) {
       const channel = u.pathname.split("/").filter(Boolean)[0];
       if (channel) return `https://player.twitch.tv/?channel=${channel}&parent=${window.location.hostname}&muted=true`;
     }
-    // Dailymotion
     const dmMatch = url.match(/dailymotion\.com\/video\/([^_]+)/);
     if (dmMatch) return `https://www.dailymotion.com/embed/video/${dmMatch[1]}`;
-    // Generic iframe attempt
     return url;
   } catch {
     return null;
@@ -115,14 +111,14 @@ function StreamPlayer({ url, title }: { url: string; title?: string | null }) {
 }
 
 function EmojiReactionBar({ post }: { post: FeedPost }) {
-  const { userId } = useCurrentUser();
   const queryClient = useQueryClient();
 
   const reactMutation = useMutation({
     mutationFn: async (emoji: string) => {
       const res = await fetch(`/api/feed/${post.id}/react`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${userId}` },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ emoji }),
       });
       return res.json() as Promise<{ reacted: boolean; emoji: string }>;
@@ -188,7 +184,7 @@ function CommentSection({ post }: { post: FeedPost }) {
     queryKey: ["feed-comments", post.id],
     queryFn: async () => {
       const res = await fetch(`/api/feed/${post.id}/comments`, {
-        headers: { Authorization: `Bearer ${userId}` },
+        credentials: "include",
       });
       return res.json();
     },
@@ -198,7 +194,8 @@ function CommentSection({ post }: { post: FeedPost }) {
     mutationFn: async (content: string) => {
       const res = await fetch(`/api/feed/${post.id}/comments`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${userId}` },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content }),
       });
       if (!res.ok) throw new Error("Failed");
@@ -217,7 +214,7 @@ function CommentSection({ post }: { post: FeedPost }) {
     mutationFn: async (commentId: number) => {
       await fetch(`/api/feed/${post.id}/comments/${commentId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${userId}` },
+        credentials: "include",
       });
     },
     onSuccess: (_data, commentId) => {
@@ -290,14 +287,13 @@ function CommentSection({ post }: { post: FeedPost }) {
 
 function PostCard({ post, currentUserId, isAdmin }: { post: FeedPost; currentUserId: number; isAdmin: boolean }) {
   const queryClient = useQueryClient();
-  const { userId } = useCurrentUser();
   const [showComments, setShowComments] = useState(false);
 
   const likeMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/feed/${post.id}/like`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${userId}` },
+        credentials: "include",
       });
       return res.json();
     },
@@ -320,7 +316,7 @@ function PostCard({ post, currentUserId, isAdmin }: { post: FeedPost; currentUse
     mutationFn: async () => {
       await fetch(`/api/feed/${post.id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${userId}` },
+        credentials: "include",
       });
     },
     onSuccess: () => {
@@ -419,7 +415,6 @@ function PostCard({ post, currentUserId, isAdmin }: { post: FeedPost; currentUse
 }
 
 function GoLiveDialog({ onClose }: { onClose: () => void }) {
-  const { userId } = useCurrentUser();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({ title: "", url: "", caption: "" });
 
@@ -427,7 +422,8 @@ function GoLiveDialog({ onClose }: { onClose: () => void }) {
     mutationFn: async () => {
       const res = await fetch("/api/feed", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${userId}` },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: form.caption || `🔴 LIVE NOW: ${form.title}`,
           isStream: true,
@@ -515,13 +511,13 @@ function PostComposer({ isAdmin }: { isAdmin: boolean }) {
   const [content, setContent] = useState("");
   const [showGoLive, setShowGoLive] = useState(false);
   const queryClient = useQueryClient();
-  const { userId } = useCurrentUser();
 
   const postMutation = useMutation({
     mutationFn: async (text: string) => {
       const res = await fetch("/api/feed", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${userId}` },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: text }),
       });
       if (!res.ok) throw new Error("Failed to post");
@@ -588,7 +584,7 @@ export function FeedPage() {
     queryKey: ["feed"],
     queryFn: async () => {
       const res = await fetch("/api/feed", {
-        headers: { Authorization: `Bearer ${userId}` },
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to load feed");
       return res.json();
@@ -597,39 +593,42 @@ export function FeedPage() {
   });
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-white mb-6">Fan Feed</h1>
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      <PostComposer isAdmin={isAdmin} />
 
-      <div className="mb-5">
-        <PostComposer isAdmin={isAdmin} />
-      </div>
-
-      <div className="space-y-3">
-        {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => (
+      {isLoading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
             <div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
               <div className="flex gap-3">
                 <Skeleton className="w-10 h-10 rounded-full shrink-0" />
                 <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-32" />
                   <Skeleton className="h-16 w-full" />
-                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-4 w-24" />
                 </div>
               </div>
             </div>
-          ))
-        ) : posts && posts.length > 0 ? (
-          posts.map((post) => (
-            <PostCard key={post.id} post={post} currentUserId={userId} isAdmin={isAdmin} />
-          ))
-        ) : (
-          <div className="text-center py-16 text-gray-500">
-            <div className="text-4xl mb-3">📢</div>
-            <p className="font-medium">No posts yet</p>
-            <p className="text-sm mt-1">Be the first to share something with the fan community!</p>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : !posts || posts.length === 0 ? (
+        <div className="text-center py-16 text-gray-500">
+          <div className="text-4xl mb-3">📣</div>
+          <p className="font-medium text-gray-400">No posts yet</p>
+          <p className="text-sm mt-1">Be the first to share something with the community!</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              currentUserId={userId}
+              isAdmin={isAdmin}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
