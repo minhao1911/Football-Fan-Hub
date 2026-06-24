@@ -46,3 +46,4 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
+GEMINI_API_KEY = "AQ.Ab8RN6ICFJ2MiQf3fHsyq7JtsTTXlTq9-4pKgY9Rr8lNn-L9zw"
