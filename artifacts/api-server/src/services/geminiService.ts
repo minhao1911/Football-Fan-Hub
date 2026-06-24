@@ -3,7 +3,7 @@ import { GoogleGenerativeAI, type GenerativeModel } from "@google/generative-ai"
 let _client: GoogleGenerativeAI | null = null;
 let _model: GenerativeModel | null = null;
 
-const AI_MODEL = "gemini-1.5-flash";
+const AI_MODEL = "gemini-2.0-flash";
 
 function getModel(): GenerativeModel {
   if (!process.env.GEMINI_API_KEY) {
