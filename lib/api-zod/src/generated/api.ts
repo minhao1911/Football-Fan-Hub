@@ -313,10 +313,6 @@ export const ListChatMessagesParams = zod.object({
   "matchId": zod.coerce.number()
 })
 
-export const ListChatMessagesQueryParams = zod.object({
-  "since": zod.coerce.number().optional().describe('Last message ID seen (for polling)')
-})
-
 export const ListChatMessagesResponseItem = zod.object({
   "id": zod.number(),
   "matchId": zod.number(),
@@ -504,6 +500,66 @@ export const GetMyPredictionResponse = zod.object({
   "xpAwarded": zod.number().nullish(),
   "createdAt": zod.string()
 })
+
+
+/**
+ * @summary Get poll results for a match
+ */
+export const GetMatchPollParams = zod.object({
+  "matchId": zod.coerce.number()
+})
+
+export const GetMatchPollResponse = zod.object({
+  "matchId": zod.number(),
+  "homeWin": zod.number(),
+  "draw": zod.number(),
+  "awayWin": zod.number(),
+  "totalVotes": zod.number(),
+  "myVote": zod.union([zod.literal('home_win'),zod.literal('draw'),zod.literal('away_win'),zod.literal(null)]).nullish()
+})
+
+
+/**
+ * @summary Submit a vote in a match poll
+ */
+export const VoteMatchPollParams = zod.object({
+  "matchId": zod.coerce.number()
+})
+
+export const VoteMatchPollBody = zod.object({
+  "outcome": zod.enum(['home_win', 'draw', 'away_win'])
+})
+
+export const VoteMatchPollResponse = zod.object({
+  "matchId": zod.number(),
+  "homeWin": zod.number(),
+  "draw": zod.number(),
+  "awayWin": zod.number(),
+  "totalVotes": zod.number(),
+  "myVote": zod.union([zod.literal('home_win'),zod.literal('draw'),zod.literal('away_win'),zod.literal(null)]).nullish()
+})
+
+
+/**
+ * @summary Get poll results for all matches
+ */
+export const ListPollsResponseItem = zod.object({
+  "matchId": zod.number(),
+  "homeTeam": zod.string(),
+  "awayTeam": zod.string(),
+  "title": zod.string().optional(),
+  "status": zod.enum(['upcoming', 'live', 'settled']),
+  "scheduledAt": zod.string().nullish(),
+  "poll": zod.object({
+  "matchId": zod.number(),
+  "homeWin": zod.number(),
+  "draw": zod.number(),
+  "awayWin": zod.number(),
+  "totalVotes": zod.number(),
+  "myVote": zod.union([zod.literal('home_win'),zod.literal('draw'),zod.literal('away_win'),zod.literal(null)]).nullish()
+})
+})
+export const ListPollsResponse = zod.array(ListPollsResponseItem)
 
 
 /**

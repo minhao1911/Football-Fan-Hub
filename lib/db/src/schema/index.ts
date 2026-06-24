@@ -1,8 +1,9 @@
-import { pgTable, text, serial, integer, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, pgEnum, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
 export const matchStatusEnum = pgEnum("match_status", ["upcoming", "live", "settled"]);
+export const pollOutcomeEnum = pgEnum("poll_outcome", ["home_win", "draw", "away_win"]);
 
 export const usersTable = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -148,7 +149,16 @@ export const insertChatMessageSchema = createInsertSchema(chatMessagesTable).omi
 export const insertForumPostSchema = createInsertSchema(forumPostsTable).omit({ id: true, createdAt: true });
 export const insertForumReplySchema = createInsertSchema(forumRepliesTable).omit({ id: true, createdAt: true });
 export const insertPokeSchema = createInsertSchema(pokesTable).omit({ id: true, createdAt: true });
+export const matchPollVotesTable = pgTable("match_poll_votes", {
+  id: serial("id").primaryKey(),
+  matchId: integer("match_id").notNull(),
+  userId: integer("user_id").notNull(),
+  outcome: pollOutcomeEnum("outcome").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (t) => [unique().on(t.matchId, t.userId)]);
+
 export const insertPredictionSchema = createInsertSchema(predictionsTable).omit({ id: true, createdAt: true });
+export const insertMatchPollVoteSchema = createInsertSchema(matchPollVotesTable).omit({ id: true, createdAt: true });
 
 export type User = typeof usersTable.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

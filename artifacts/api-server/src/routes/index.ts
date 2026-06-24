@@ -12,6 +12,7 @@ import adminRouter from "./admin";
 import notificationsRouter from "./notifications";
 import feedRouter from "./feed";
 import aiRouter from "./ai/index";
+import pollsRouter from "./polls";
 
 const router: IRouter = Router();
 
@@ -23,6 +24,7 @@ router.use(chatRouter);
 router.use(forumRouter);
 router.use(pokesRouter);
 router.use(predictionsRouter);
+router.use(pollsRouter);
 router.use(leaderboardRouter);
 router.use(adminRouter);
 router.use(notificationsRouter);

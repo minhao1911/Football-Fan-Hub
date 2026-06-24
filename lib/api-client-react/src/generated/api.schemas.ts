@@ -235,6 +235,61 @@ export interface PredictionInput {
   awayScore: number;
 }
 
+/**
+ * @nullable
+ */
+export type MatchPollMyVote = typeof MatchPollMyVote[keyof typeof MatchPollMyVote] | null;
+
+
+export const MatchPollMyVote = {
+  home_win: 'home_win',
+  draw: 'draw',
+  away_win: 'away_win',
+} as const;
+
+export interface MatchPoll {
+  matchId: number;
+  homeWin: number;
+  draw: number;
+  awayWin: number;
+  totalVotes: number;
+  /** @nullable */
+  myVote?: MatchPollMyVote;
+}
+
+export type MatchPollVoteInputOutcome = typeof MatchPollVoteInputOutcome[keyof typeof MatchPollVoteInputOutcome];
+
+
+export const MatchPollVoteInputOutcome = {
+  home_win: 'home_win',
+  draw: 'draw',
+  away_win: 'away_win',
+} as const;
+
+export interface MatchPollVoteInput {
+  outcome: MatchPollVoteInputOutcome;
+}
+
+export type MatchPollSummaryStatus = typeof MatchPollSummaryStatus[keyof typeof MatchPollSummaryStatus];
+
+
+export const MatchPollSummaryStatus = {
+  upcoming: 'upcoming',
+  live: 'live',
+  settled: 'settled',
+} as const;
+
+export interface MatchPollSummary {
+  matchId: number;
+  homeTeam: string;
+  awayTeam: string;
+  title?: string;
+  status: MatchPollSummaryStatus;
+  /** @nullable */
+  scheduledAt?: string | null;
+  poll: MatchPoll;
+}
+
 export interface GroupLeaderboardEntry {
   rank: number;
   groupId: number;
@@ -285,11 +340,4 @@ export const ListMatchesStatus = {
   upcoming: 'upcoming',
   settled: 'settled',
 } as const;
-
-export type ListChatMessagesParams = {
-/**
- * Last message ID seen (for polling)
- */
-since?: number;
-};
 

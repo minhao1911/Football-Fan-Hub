@@ -19,6 +19,7 @@ import { LeaderboardPage } from "@/pages/LeaderboardPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { AdminPage } from "@/pages/AdminPage";
 import { FeedPage } from "@/pages/FeedPage";
+import { FanPollsPage } from "@/pages/FanPollsPage";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -234,6 +235,7 @@ function AppShell() {
             <Route path="/matches" component={MatchesPage} />
             <Route path="/matches/:id" component={MatchDetailPage} />
             <Route path="/groups" component={GroupsPage} />
+            <Route path="/polls" component={FanPollsPage} />
             <Route path="/leaderboard" component={LeaderboardPage} />
             <Route path="/profile" component={ProfilePage} />
             <Route path="/admin" component={AdminPage} />

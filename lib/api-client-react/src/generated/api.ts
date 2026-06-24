@@ -32,11 +32,13 @@ import type {
   GroupLeaderboardEntry,
   GroupMember,
   HealthStatus,
-  ListChatMessagesParams,
   ListGroupsParams,
   ListMatchesParams,
   Match,
   MatchInput,
+  MatchPoll,
+  MatchPollSummary,
+  MatchPollVoteInput,
   MatchSettlement,
   MatchUpdate,
   Poke,
@@ -1112,29 +1114,20 @@ export const useSettleMatch = <TError = ErrorType<unknown>,
       return useMutation(getSettleMatchMutationOptions(options));
     }
 
-export const getListChatMessagesUrl = (matchId: number,
-    params?: ListChatMessagesParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getListChatMessagesUrl = (matchId: number,) => {
 
-  Object.entries(params || {}).forEach(([key, value]) => {
 
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
 
-  const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/matches/${matchId}/chat?${stringifiedParams}` : `/api/matches/${matchId}/chat`
+  return `/api/matches/${matchId}/chat`
 }
 
 /**
  * @summary List chat messages for a match
  */
-export const listChatMessages = async (matchId: number,
-    params?: ListChatMessagesParams, options?: RequestInit): Promise<ChatMessage[]> => {
+export const listChatMessages = async (matchId: number, options?: RequestInit): Promise<ChatMessage[]> => {
 
-  return customFetch<ChatMessage[]>(getListChatMessagesUrl(matchId,params),
+  return customFetch<ChatMessage[]>(getListChatMessagesUrl(matchId),
   {
     ...options,
     method: 'GET'
@@ -1147,25 +1140,23 @@ export const listChatMessages = async (matchId: number,
 
 
 
-export const getListChatMessagesQueryKey = (matchId: number,
-    params?: ListChatMessagesParams,) => {
+export const getListChatMessagesQueryKey = (matchId: number,) => {
     return [
-    `/api/matches/${matchId}/chat`, ...(params ? [params] : [])
+    `/api/matches/${matchId}/chat`
     ] as const;
     }
 
 
-export const getListChatMessagesQueryOptions = <TData = Awaited<ReturnType<typeof listChatMessages>>, TError = ErrorType<unknown>>(matchId: number,
-    params?: ListChatMessagesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listChatMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getListChatMessagesQueryOptions = <TData = Awaited<ReturnType<typeof listChatMessages>>, TError = ErrorType<unknown>>(matchId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listChatMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListChatMessagesQueryKey(matchId,params);
+  const queryKey =  queryOptions?.queryKey ?? getListChatMessagesQueryKey(matchId);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listChatMessages>>> = ({ signal }) => listChatMessages(matchId,params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listChatMessages>>> = ({ signal }) => listChatMessages(matchId, { signal, ...requestOptions });
 
 
 
@@ -1183,12 +1174,11 @@ export type ListChatMessagesQueryError = ErrorType<unknown>
  */
 
 export function useListChatMessages<TData = Awaited<ReturnType<typeof listChatMessages>>, TError = ErrorType<unknown>>(
- matchId: number,
-    params?: ListChatMessagesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listChatMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ matchId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listChatMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getListChatMessagesQueryOptions(matchId,params,options)
+  const queryOptions = getListChatMessagesQueryOptions(matchId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -1941,6 +1931,232 @@ export function useGetMyPrediction<TData = Awaited<ReturnType<typeof getMyPredic
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetMyPredictionQueryOptions(matchId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetMatchPollUrl = (matchId: number,) => {
+
+
+
+
+  return `/api/matches/${matchId}/poll`
+}
+
+/**
+ * @summary Get poll results for a match
+ */
+export const getMatchPoll = async (matchId: number, options?: RequestInit): Promise<MatchPoll> => {
+
+  return customFetch<MatchPoll>(getGetMatchPollUrl(matchId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMatchPollQueryKey = (matchId: number,) => {
+    return [
+    `/api/matches/${matchId}/poll`
+    ] as const;
+    }
+
+
+export const getGetMatchPollQueryOptions = <TData = Awaited<ReturnType<typeof getMatchPoll>>, TError = ErrorType<unknown>>(matchId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMatchPoll>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMatchPollQueryKey(matchId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMatchPoll>>> = ({ signal }) => getMatchPoll(matchId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(matchId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMatchPoll>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMatchPollQueryResult = NonNullable<Awaited<ReturnType<typeof getMatchPoll>>>
+export type GetMatchPollQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get poll results for a match
+ */
+
+export function useGetMatchPoll<TData = Awaited<ReturnType<typeof getMatchPoll>>, TError = ErrorType<unknown>>(
+ matchId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMatchPoll>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMatchPollQueryOptions(matchId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getVoteMatchPollUrl = (matchId: number,) => {
+
+
+
+
+  return `/api/matches/${matchId}/poll`
+}
+
+/**
+ * @summary Submit a vote in a match poll
+ */
+export const voteMatchPoll = async (matchId: number,
+    matchPollVoteInput: MatchPollVoteInput, options?: RequestInit): Promise<MatchPoll> => {
+
+  return customFetch<MatchPoll>(getVoteMatchPollUrl(matchId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      matchPollVoteInput,)
+  }
+);}
+
+
+
+
+export const getVoteMatchPollMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof voteMatchPoll>>, TError,{matchId: number;data: BodyType<MatchPollVoteInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof voteMatchPoll>>, TError,{matchId: number;data: BodyType<MatchPollVoteInput>}, TContext> => {
+
+const mutationKey = ['voteMatchPoll'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof voteMatchPoll>>, {matchId: number;data: BodyType<MatchPollVoteInput>}> = (props) => {
+          const {matchId,data} = props ?? {};
+
+          return  voteMatchPoll(matchId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VoteMatchPollMutationResult = NonNullable<Awaited<ReturnType<typeof voteMatchPoll>>>
+    export type VoteMatchPollMutationBody = BodyType<MatchPollVoteInput>
+    export type VoteMatchPollMutationError = ErrorType<void>
+
+    /**
+ * @summary Submit a vote in a match poll
+ */
+export const useVoteMatchPoll = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof voteMatchPoll>>, TError,{matchId: number;data: BodyType<MatchPollVoteInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof voteMatchPoll>>,
+        TError,
+        {matchId: number;data: BodyType<MatchPollVoteInput>},
+        TContext
+      > => {
+      return useMutation(getVoteMatchPollMutationOptions(options));
+    }
+
+export const getListPollsUrl = () => {
+
+
+
+
+  return `/api/polls`
+}
+
+/**
+ * @summary Get poll results for all matches
+ */
+export const listPolls = async ( options?: RequestInit): Promise<MatchPollSummary[]> => {
+
+  return customFetch<MatchPollSummary[]>(getListPollsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPollsQueryKey = () => {
+    return [
+    `/api/polls`
+    ] as const;
+    }
+
+
+export const getListPollsQueryOptions = <TData = Awaited<ReturnType<typeof listPolls>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPolls>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPollsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPolls>>> = ({ signal }) => listPolls({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPolls>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPollsQueryResult = NonNullable<Awaited<ReturnType<typeof listPolls>>>
+export type ListPollsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get poll results for all matches
+ */
+
+export function useListPolls<TData = Awaited<ReturnType<typeof listPolls>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPolls>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPollsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

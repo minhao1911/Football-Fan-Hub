@@ -1,11 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { Rss, Swords, Users, Trophy, User } from "lucide-react";
+import { Rss, Swords, BarChart2, Trophy, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/feed",        label: "Home",       icon: Rss },
   { href: "/matches",     label: "Fixtures",   icon: Swords },
-  { href: "/groups",      label: "Nations",    icon: Users },
+  { href: "/polls",       label: "Polls",      icon: BarChart2 },
   { href: "/leaderboard", label: "Leaders",    icon: Trophy },
   { href: "/profile",     label: "Profile",    icon: User },
 ];

@@ -23,6 +23,8 @@ tags:
     description: Match poke interactions
   - name: predictions
     description: Match score predictions
+  - name: polls
+    description: Fan match outcome polls
   - name: leaderboard
     description: Group and user leaderboards
   - name: admin
@@ -553,6 +555,68 @@ paths:
         "404":
           description: No prediction yet
 
+  # Polls
+  /matches/{matchId}/poll:
+    get:
+      operationId: getMatchPoll
+      tags: [polls]
+      summary: Get poll results for a match
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Poll results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchPoll"
+    post:
+      operationId: voteMatchPoll
+      tags: [polls]
+      summary: Submit a vote in a match poll
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchPollVoteInput"
+      responses:
+        "200":
+          description: Updated poll results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchPoll"
+        "400":
+          description: Invalid input or already voted
+        "401":
+          description: Unauthorized
+
+  /polls:
+    get:
+      operationId: listPolls
+      tags: [polls]
+      summary: Get poll results for all matches
+      responses:
+        "200":
+          description: Poll results for all matches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MatchPollSummary"
+
   # Leaderboard
   /leaderboard/groups:
     get:
@@ -946,6 +1010,52 @@ components:
           type: integer
         awayScore:
           type: integer
+
+    MatchPoll:
+      type: object
+      required: [matchId, homeWin, draw, awayWin, totalVotes]
+      properties:
+        matchId:
+          type: integer
+        homeWin:
+          type: integer
+        draw:
+          type: integer
+        awayWin:
+          type: integer
+        totalVotes:
+          type: integer
+        myVote:
+          type: ["string", "null"]
+          enum: [home_win, draw, away_win, null]
+
+    MatchPollVoteInput:
+      type: object
+      required: [outcome]
+      properties:
+        outcome:
+          type: string
+          enum: [home_win, draw, away_win]
+
+    MatchPollSummary:
+      type: object
+      required: [matchId, homeTeam, awayTeam, status, poll]
+      properties:
+        matchId:
+          type: integer
+        homeTeam:
+          type: string
+        awayTeam:
+          type: string
+        title:
+          type: string
+        status:
+          type: string
+          enum: [upcoming, live, settled]
+        scheduledAt:
+          type: ["string", "null"]
+        poll:
+          $ref: "#/components/schemas/MatchPoll"
 
     GroupLeaderboardEntry:
       type: object
