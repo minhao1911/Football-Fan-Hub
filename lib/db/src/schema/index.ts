@@ -117,6 +117,17 @@ export const feedReactionsTable = pgTable("feed_reactions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const pushPlatformEnum = pgEnum("push_platform", ["android", "ios", "web"]);
+
+export const pushTokensTable = pgTable("push_tokens", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  token: text("token").notNull().unique(),
+  platform: pushPlatformEnum("platform").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const notificationTypeEnum = pgEnum("notification_type", ["poke", "forum_reply", "match_live", "stream_live"]);
 
 export const notificationsTable = pgTable("notifications", {
