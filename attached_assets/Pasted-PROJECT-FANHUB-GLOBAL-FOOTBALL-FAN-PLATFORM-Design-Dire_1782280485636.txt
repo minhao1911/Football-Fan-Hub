@@ -1,0 +1,97 @@
+PROJECT: FANHUB – GLOBAL FOOTBALL FAN PLATFORM
+
+Design Direction:
+Create a premium football experience inspired by a fresh green stadium on match day.
+
+Visual Identity:
+
+* Main Theme: Fresh Stadium Green
+* Style: Modern, energetic, immersive, premium
+* Feel: Standing inside a world-class football stadium before kickoff
+* Atmosphere: Bright daylight, lush green grass, packed crowd, subtle stadium lights
+
+Color Palette:
+
+* Primary Green: #1DB954
+* Stadium Grass: #22C55E
+* Dark Turf: #166534
+* Pitch Lines: #FFFFFF
+* Background: #071A0F
+* Accent Gold: #FACC15
+* Card Surface: rgba(255,255,255,0.08)
+
+Background Design:
+
+* Full-screen football stadium backdrop
+* Fresh green pitch visible in lower section
+* Stadium seating blurred in background
+* Soft sunlight beams across the field
+* Subtle crowd atmosphere
+* Modern glassmorphism overlays
+
+Homepage Hero:
+
+* Large stadium banner image
+* Live football atmosphere
+* Dynamic welcome message:
+  "The Home of Global Football Fans"
+
+Navigation:
+
+* Home
+* Fixtures
+* Fan Polls
+* Nation Communities
+* Leaderboards
+* Match Center
+* Profile
+
+UI Components:
+
+* Rounded modern cards
+* Frosted glass effect
+* Floating action buttons
+* Smooth animations
+* Stadium-inspired gradients
+* Green glowing accents
+
+Match Cards:
+
+* Team flags
+* Team logos
+* Match countdown
+* Confidence poll
+* Live score indicator
+* Stadium venue
+
+Fan Community:
+
+* Nation-specific fan hubs
+* Match discussions
+* Predictions
+* Reactions
+* Reputation points
+
+Special Effects:
+
+* Stadium floodlight glow
+* Animated grass texture
+* Smooth page transitions
+* Goal celebration animation
+* Crowd pulse effects
+
+Typography:
+
+* Bold sports-style headings
+* Clean modern body text
+* High contrast for accessibility
+
+Mobile Experience:
+
+* Fast loading
+* PWA ready
+* Responsive design
+* App-like navigation
+
+Overall Goal:
+Make users feel like they are inside a vibrant football stadium every time they open FanHub. The design should be fresh, exciting, premium, and focused on the beauty of the green football pitch and global fan culture.
