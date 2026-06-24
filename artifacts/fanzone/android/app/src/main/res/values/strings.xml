@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FanZone</string>
+    <string name="title_activity_main">FanZone</string>
+    <string name="package_name">com.fanzone.app</string>
+    <string name="custom_url_scheme">com.fanzone.app</string>
+</resources>

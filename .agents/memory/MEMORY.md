@@ -1,3 +1,4 @@
 - [Mobile-first PWA layout](mobile-pwa.md) — FanZone converted to mobile-first with TopBar + BottomNav replacing single NavBar; safe area CSS vars; SW at /sw.js.
 - [AI integration pattern](ai-integration.md) — Primary AI via GEMINI_API_KEY (gemini-2.0-flash); geminiService.ts with retry/cache; aiProvider.ts re-exports it; openaiClient.ts uses OPENAI_API_KEY for /ai/assistant only.
 - [Dev setup gotchas](dev-setup.md) — Workflow commands must bake PORT inline (PORT=5000 / PORT=8080); artifact.toml port 25764 replaced with 5000; VITE_CLERK_PROXY_URL must NOT be set in dev (Clerk proxy only works in production); use artifact workflows not manual ones to avoid port conflicts.
+- [Capacitor native setup](capacitor-setup.md) — FanZone wrapped with Capacitor 8; Android + iOS projects generated; Node 22 required for cap CLI; native build uses vite.native.config.ts (base="./", no PORT required); cap sync command: `npx cap sync` from artifacts/fanzone.

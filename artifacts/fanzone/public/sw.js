@@ -1,10 +1,10 @@
-const CACHE_NAME = "fanzone-v1";
+const CACHE_NAME = "fanzone-v2";
 const STATIC_ASSETS = [
-  "/",
-  "/manifest.json",
-  "/favicon.svg",
-  "/icons/icon-192.svg",
-  "/icons/icon-512.svg",
+  "./",
+  "./manifest.json",
+  "./favicon.svg",
+  "./icons/icon-192.svg",
+  "./icons/icon-512.svg",
 ];
 
 self.addEventListener("install", (event) => {
@@ -27,14 +27,34 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
-  const url = new URL(request.url);
 
-  // Skip non-GET and API requests — always go to network for those
-  if (request.method !== "GET" || url.pathname.startsWith("/api/")) {
+  let url;
+  try {
+    url = new URL(request.url);
+  } catch {
     return;
   }
 
-  // For navigation requests: network-first with cache fallback
+  // Skip non-GET, non-http(s), and Capacitor bridge requests
+  if (
+    request.method !== "GET" ||
+    (url.protocol !== "http:" && url.protocol !== "https:") ||
+    url.pathname.startsWith("/api/") ||
+    url.hostname === "capacitor"
+  ) {
+    return;
+  }
+
+  // Skip Clerk and external auth endpoints — always network
+  if (
+    url.hostname.includes("clerk") ||
+    url.hostname.includes("accounts.dev") ||
+    url.hostname.includes("firebase")
+  ) {
+    return;
+  }
+
+  // Navigation: network-first, cache fallback
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -43,14 +63,22 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE_NAME).then((c) => c.put(request, clone));
           return res;
         })
-        .catch(() => caches.match("/").then((r) => r || new Response("Offline", { status: 503 })))
+        .catch(() =>
+          caches.match(request).then(
+            (r) =>
+              r ||
+              caches
+                .match("./")
+                .then((r2) => r2 || new Response("Offline", { status: 503 }))
+          )
+        )
     );
     return;
   }
 
-  // For static assets: cache-first
+  // Static assets: cache-first
   if (
-    url.pathname.match(/\.(js|css|svg|png|jpg|jpeg|webp|woff2?|ico)$/) ||
+    url.pathname.match(/\.(js|css|svg|png|jpg|jpeg|webp|woff2?|ico|json)$/) ||
     url.pathname.startsWith("/icons/") ||
     url.pathname.startsWith("/assets/")
   ) {

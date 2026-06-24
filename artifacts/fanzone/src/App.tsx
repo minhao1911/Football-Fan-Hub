@@ -10,6 +10,8 @@ import { UserProvider } from "@/contexts/UserContext";
 import { TopBar } from "@/components/TopBar";
 import { BottomNav } from "@/components/BottomNav";
 import { SplashScreen } from "@/components/SplashScreen";
+import { NativeInit } from "@/components/NativeInit";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { MatchesPage } from "@/pages/MatchesPage";
 import { MatchDetailPage } from "@/pages/MatchDetailPage";
 import { GroupsPage } from "@/pages/GroupsPage";
@@ -177,6 +179,8 @@ function AppShell() {
 
   return (
     <TooltipProvider>
+      <NativeInit />
+      <OfflineBanner />
       {!splashDone && <SplashScreen onDone={handleSplashDone} />}
       <div className="min-h-screen bg-gray-950 flex flex-col">
         <TopBar />

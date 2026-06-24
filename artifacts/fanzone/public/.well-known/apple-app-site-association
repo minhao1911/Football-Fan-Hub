@@ -1,0 +1,22 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "YOURTEAMID.com.fanzone.app",
+        "paths": [
+          "/feed*",
+          "/matches*",
+          "/groups*",
+          "/leaderboard*",
+          "/profile*",
+          "/sign-in*",
+          "/sign-up*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["YOURTEAMID.com.fanzone.app"]
+  }
+}
