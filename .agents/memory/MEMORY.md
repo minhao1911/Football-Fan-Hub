@@ -1,1 +1,2 @@
 - [Mobile-first PWA layout](mobile-pwa.md) — FanZone converted to mobile-first with TopBar + BottomNav replacing single NavBar; safe area CSS vars; SW at /sw.js.
+- [AI integration pattern](ai-integration.md) — OpenAI added via direct OPENAI_API_KEY (Replit AI proxy unavailable); services in api-server/src/services/; routes at /api/ai/*; frontend hooks in fanzone/src/hooks/useAi.ts.

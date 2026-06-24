@@ -15,8 +15,9 @@ import { useCurrentUser } from "@/contexts/UserContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { Send, Plus, Zap, Target, MessageCircle, BookOpen, Flame } from "lucide-react";
+import { Send, Plus, Zap, Target, MessageCircle, BookOpen, Flame, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { MatchAiInsights } from "@/components/MatchAiInsights";
 
 type Tab = "chat" | "forum" | "predict" | "pokes";
 
@@ -54,6 +55,8 @@ export function MatchDetailPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
+      <MatchAiInsights match={match} />
+
       <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
         <div className="flex items-center gap-2 mb-4">
           <span className={cn("text-xs text-white px-2 py-0.5 rounded-full font-medium", statusBadge[match.status])}>

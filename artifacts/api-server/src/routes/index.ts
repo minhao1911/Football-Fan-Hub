@@ -11,6 +11,7 @@ import leaderboardRouter from "./leaderboard";
 import adminRouter from "./admin";
 import notificationsRouter from "./notifications";
 import feedRouter from "./feed";
+import aiRouter from "./ai/index";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(leaderboardRouter);
 router.use(adminRouter);
 router.use(notificationsRouter);
 router.use(feedRouter);
+router.use(aiRouter);
 
 export default router;

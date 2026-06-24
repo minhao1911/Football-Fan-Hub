@@ -3,6 +3,7 @@ import { useGetGroupLeaderboard, useGetUserLeaderboard } from "@workspace/api-cl
 import { Trophy, Users, Zap } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { CommunityInsightsWidget } from "@/components/LeaderboardAi";
 
 type LeaderTab = "users" | "groups";
 
@@ -18,6 +19,10 @@ export function LeaderboardPage() {
       <div className="flex items-center gap-3 mb-6">
         <Trophy size={24} className="text-yellow-400" />
         <h1 className="text-2xl font-bold text-white">Leaderboard</h1>
+      </div>
+
+      <div className="mb-6">
+        <CommunityInsightsWidget />
       </div>
 
       <div className="flex gap-2 mb-6">
