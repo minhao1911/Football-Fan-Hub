@@ -25,7 +25,7 @@ import {
   generateSentimentAnalysis,
   generateBadgeAnnouncement,
 } from "../../services/communityInsightsService.js";
-import { generateText, SYSTEM_BASE } from "../../services/openaiClient.js";
+import { generateText, SYSTEM_BASE } from "../../services/aiProvider.js";
 
 const router = Router();
 router.use(authMiddleware);

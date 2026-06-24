@@ -1,4 +1,4 @@
-import { generateText, SYSTEM_BASE } from "./openaiClient.js";
+import { generateText, SYSTEM_BASE } from "./aiProvider.js";
 
 interface MatchData {
   homeTeam: string;
