@@ -1,0 +1,215 @@
+Integrate Google Gemini API into the existing FanHub football community platform.
+
+FanHub already includes:
+
+* User authentication
+* Football communities/groups
+* Match predictions
+* XP system
+* Leaderboards
+* Discussion feeds
+* Admin dashboard
+
+Use Gemini as the primary AI provider for all AI-powered features.
+
+ENVIRONMENT VARIABLES
+
+Store securely in Replit Secrets:
+
+GEMINI_API_KEY
+
+Never expose API keys to the frontend.
+
+Create all Gemini requests through backend APIs only.
+
+ARCHITECTURE
+
+Create:
+
+services/aiProvider.ts
+
+services/geminiService.ts
+
+services/discussionService.ts
+
+services/matchRecapService.ts
+
+services/sentimentService.ts
+
+services/communityInsightsService.ts
+
+services/notificationService.ts
+
+All AI features must be modular and reusable.
+
+FANHUB AI FEATURES
+
+1. MATCH PREVIEW GENERATOR
+
+When a new fixture is imported:
+
+Generate:
+
+* Match headline
+* Match overview
+* Key storylines
+* Players to watch
+* Community discussion questions
+
+Example:
+
+"Argentina faces Brazil tonight in a crucial World Cup showdown. Can Argentina continue their impressive run?"
+
+2. AI DISCUSSION ENGINE
+
+Automatically generate posts.
+
+Before Match:
+
+* Prediction discussions
+* Match build-up discussions
+
+Halftime:
+
+* Live reaction discussions
+
+After Match:
+
+* Match reaction discussions
+* Tactical debates
+
+3. AI MATCH RECAPS
+
+After final score is available:
+
+Generate:
+
+* Match summary
+* Tactical analysis
+* Key moments
+* Man of the Match discussion
+* Community engagement question
+
+4. FAN SENTIMENT ANALYSIS
+
+Analyze:
+
+* Posts
+* Comments
+* Reactions
+
+Return:
+
+* Positive %
+* Neutral %
+* Negative %
+
+Generate a summary of fan mood.
+
+5. COMMUNITY INSIGHTS
+
+Generate:
+
+* Trending communities
+* Trending topics
+* Most active users
+* Fastest-growing communities
+
+6. LEADERBOARD COMMENTARY
+
+Generate messages such as:
+
+"Samuel climbs to #3 globally after a strong prediction streak."
+
+"Argentina Fans remain the highest-ranked community."
+
+7. BADGE & ACHIEVEMENT ANNOUNCEMENTS
+
+Generate dynamic achievement messages.
+
+Examples:
+
+* Prediction Master unlocked
+* 5 Match Win Streak
+* Community Champion
+
+8. FANHUB AI ASSISTANT
+
+Users can ask:
+
+* Football questions
+* Team analysis
+* Historical football facts
+* Tournament explanations
+* Tactical explanations
+
+The assistant should behave like a professional football analyst.
+
+PREDICTION SYSTEM
+
+Do NOT allow AI to calculate XP.
+
+XP calculations must come from backend business logic.
+
+AI should only explain results.
+
+Example:
+
+"You correctly predicted the winner and earned 20 XP."
+
+DATA SAFETY RULES
+
+AI must never invent:
+
+* Fixtures
+* Live scores
+* Standings
+* Statistics
+* Match results
+
+Use only data from:
+
+* FanHub database
+* Football APIs
+* Official match data
+
+COST OPTIMIZATION
+
+Implement caching.
+
+Cache:
+
+* Match previews
+* Match recaps
+* Community insights
+
+Do not generate content repeatedly for identical requests.
+
+Generate AI content only when:
+
+* New fixture arrives
+* Match ends
+* Community activity threshold is reached
+
+PERFORMANCE
+
+Implement:
+
+* Retry logic
+* Error handling
+* Request throttling
+* Rate limiting
+* Logging
+
+DESIGN GOAL
+
+FanHub should feel like a combination of:
+
+* Reddit
+* Discord
+* WhatsApp Communities
+* Fantasy Football
+
+powered by Gemini AI.
+
+The AI should increase engagement, discussion quality, prediction participation, and community retention while keeping operational costs low and maintaining production-grade scalability.
